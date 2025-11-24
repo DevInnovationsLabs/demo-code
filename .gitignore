@@ -148,6 +148,12 @@ local.properties
 *.keystore
 !debug.keystore
 .kotlin/
+node_modules/
+android/.idea/
+android/app/src/main/assets/index.android.bundle
+ios/Pods/
+*.log
+.env
 
 # node.js
 node_modules/
