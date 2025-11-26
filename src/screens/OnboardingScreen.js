@@ -18,24 +18,28 @@ const SCREENS = [
     key: '1',
     title: 'Welcome to the HR Application',
     description:
-      "Welcome to HRD App! Elevate your attendance experience with ease and efficiency! Begin your productive journey today!",
-    image: require('../assets/hello.png'),
+      "Welcome to HRD App! elevate your attendance\nexperience with ease and efficiency! begin your\nproductive journey today!",
+    image: require('../assets/hello.png'), 
   },
   {
     key: '2',
-    title: 'Seamless design and feature improvement',
+    title: 'Seamless design and feature\nimprovement',
     description:
-      'Simplify your HR processes and enhance your workflow with our intuitive features designed for ultimate flexibility.',
-    image: require('../assets/rafiki.png'),
+      'Simplify your HR processes and enhance your\nworkflow with our intuitive features designed for\nultimate flexibility.',
+    image: require('../assets/rafiki.png'), 
   },
   {
     key: '3',
     title: 'All employee duty in one app!',
     description:
-      "Ready for peak productivity? Let’s dive in and elevate your efficiency!",
-    image: require('../assets/chair.png'),
+      "Ready for peak productivity? Let’s dive in and\nelevate your efficiency!",
+    image: require('../assets/chair.png'), 
   },
 ];
+
+const CARD_PADDING = 24;
+const BASE_DOT_WIDTH = 8;
+const MAX_DOT_WIDTH = 60;
 
 export default function OnboardingScreen() {
   const navigation = useNavigation();
@@ -54,6 +58,13 @@ export default function OnboardingScreen() {
     } else {
       navigation.replace('Login');
     }
+  };
+
+  const handleDotPress = (dotIndex) => {
+    scrollRef.current.scrollTo({
+      x: dotIndex * width,
+      animated: true,
+    });
   };
 
   const onScrollEnd = (e) => {
@@ -78,62 +89,109 @@ export default function OnboardingScreen() {
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false } 
         )}
       >
-        {SCREENS.map((screen, i) => (
-          <View key={screen.key} style={styles.page}>
+        {SCREENS.map((screen, i) => {
+          
+          const inputRange = [
+            (i - 1) * width, 
+            i * width,       
+            (i + 1) * width, 
+          ];
 
-            <View style={styles.illustrationWrapper}>
-              <Image source={screen.image} style={styles.illustration} />
-            </View>
+          const contentOpacity = scrollX.interpolate({
+            inputRange,
+            outputRange: [0, 1, 0], 
+            extrapolate: 'clamp',
+          });
+          
+          const contentScale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.8, 1, 0.8], 
+            extrapolate: 'clamp',
+          });
 
-            <View style={styles.card}>
-              <Text style={styles.title}>{screen.title}</Text>
-              <Text style={styles.description}>{screen.description}</Text>
+          return (
+            <View key={screen.key} style={styles.page}>
+              
+              <View style={styles.contentAndCardWrapper}>
+              
+                <Animated.View 
+                    style={[
+                        styles.illustrationWrapper, 
+                        { 
+                            opacity: contentOpacity,
+                            transform: [
+                                { scale: contentScale },
+                            ],
+                        }
+                    ]}
+                >
+                    <Image source={screen.image} style={styles.illustration} />
+                </Animated.View>
 
-              <View style={styles.bottomRow}>
-                <View style={styles.dotsRow}>
-                  {SCREENS.map((_, dotIndex) => {
-                    const inputRange = [
-                      (dotIndex - 1) * width,
-                      dotIndex * width,
-                      (dotIndex + 1) * width,
-                    ];
+                <View style={styles.card}>
+                
+                  <Animated.View
+                    style={[{
+                        opacity: contentOpacity,
+                        transform: [{ scale: contentScale }],
+                    }, styles.textBlockContainer]} 
+                  >
+                    <Text style={styles.title}>{screen.title}</Text>
+                    <Text style={styles.description}>{screen.description}</Text>
+                  </Animated.View>
+                  
+                  <View style={styles.bottomRowAbsolute}> 
+                    <View style={styles.dotsRow}>
+                      {SCREENS.map((_, dotIndex) => {
+                        const dotInputRange = [
+                          (dotIndex - 1) * width,
+                          dotIndex * width,
+                          (dotIndex + 1) * width,
+                        ];
+                        
+                        const animatedWidth = scrollX.interpolate({
+                          inputRange: dotInputRange,
+                          outputRange: [BASE_DOT_WIDTH, MAX_DOT_WIDTH, BASE_DOT_WIDTH],
+                          extrapolate: 'clamp',
+                        });
 
-                    const animatedWidth = scrollX.interpolate({
-                      inputRange,
-                      outputRange: [8, 28, 8],
-                      extrapolate: 'clamp',
-                    });
+                        const isActive = dotIndex === index;
 
-                    const isActive = dotIndex === index;
+                        return (
+                          <TouchableOpacity 
+                            key={dotIndex}
+                            onPress={() => handleDotPress(dotIndex)}
+                            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+                          >
+                            <Animated.View
+                              style={[
+                                styles.dot,
+                                {
+                                  width: animatedWidth, 
+                                  backgroundColor: isActive ? '#FF6E4E' : '#FFCBBF',
+                                },
+                              ]}
+                            />
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
 
-                    return (
-                      <Animated.View
-                        key={dotIndex}
-                        style={[
-                          styles.dot,
-                          {
-                            width: animatedWidth,
-                            backgroundColor: isActive ? '#FF6E4E' : '#FFCBBF',
-                          },
-                        ]}
-                      />
-                    );
-                  })}
+                    <TouchableOpacity style={styles.button} onPress={handleNext}>
+                      <Text style={styles.buttonText}>
+                        {i === SCREENS.length - 1 ? 'Login' : 'Next'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
                 </View>
-
-                <TouchableOpacity style={styles.button} onPress={handleNext}>
-                  <Text style={styles.buttonText}>
-                    {i === SCREENS.length - 1 ? 'Login' : 'Next'}
-                  </Text>
-                </TouchableOpacity>
               </View>
             </View>
-
-          </View>
-        ))}
+          );
+        })}
       </Animated.ScrollView>
     </View>
   );
@@ -161,18 +219,41 @@ const styles = StyleSheet.create({
     height,
     alignItems: 'center',
   },
+  contentAndCardWrapper: {
+      flex: 1,
+      width: width, 
+      alignItems: 'center',
+      position: 'relative', 
+  },
   illustrationWrapper: {
-    flex: 1,
+    flex: 1, 
     justifyContent: 'center',
     marginTop: 10,
+    paddingHorizontal: CARD_PADDING,
+    width: '100%',
   },
   illustration: {
     width: width * 0.75,
     height: height * 0.35,
     resizeMode: 'contain',
+    alignSelf: 'center',
+  },
+  card: {
+    width,
+    position: 'relative', 
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    flexShrink: 0, 
+    minHeight: height * 0.38,
+  },
+  textBlockContainer: {
+    paddingTop: 32, 
+    paddingHorizontal: CARD_PADDING, 
+    marginBottom: 60, 
   },
   title: {
-    width: 342,
+    width: '100%', 
     fontFamily: 'Inter-Medium',
     fontWeight: '500',
     fontSize: 22,
@@ -182,7 +263,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   description: {
-    width: 342,
+    width: '100%',
     fontFamily: 'Inter-Regular',
     fontWeight: '400',
     fontSize: 14,
@@ -191,35 +272,31 @@ const styles = StyleSheet.create({
     color: '#6B6D79',
     marginBottom: 35,
   },
-
-  card: {
-    width,
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
-    minHeight: height * 0.38,
-  },
-  bottomRow: {
+  bottomRowAbsolute: {
+    position: 'absolute',
+    bottom: 0, 
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: CARD_PADDING, 
+    paddingVertical: 32, 
   },
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   dot: {
-    height: 8,
+    height: BASE_DOT_WIDTH,
     borderRadius: 4,
     marginRight: 7,
   },
   button: {
     backgroundColor: '#FF6E4E',
     height: 48,
-    width: 110,
+    width: 110, 
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

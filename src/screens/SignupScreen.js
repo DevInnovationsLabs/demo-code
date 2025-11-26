@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -13,6 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function SignupScreen() {
   const navigation = useNavigation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -20,7 +22,7 @@ export default function SignupScreen() {
 
         <TouchableOpacity
           style={styles.backTopLeft}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => navigation.goBack()}
         >
           <Image
             source={require('../assets/back.png')}
@@ -33,43 +35,78 @@ export default function SignupScreen() {
           style={styles.logo}
         />
 
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <Text style={styles.headerText}>Activate Your Account</Text>
-        </View>
-
-        <View style={styles.subHeaderContainer}>
-          <Text style={styles.subHeaderText}>
-            Please make sure you have been invited by your
-          </Text>
-          <Text style={styles.subHeaderText}>
-            company to activate your account
-          </Text>
-        </View>
+        <Text style={styles.headerText}>Activate Your Account</Text>
+        <Text style={styles.subHeader}>
+          Please make sure you have been invited by your company to activate your account
+        </Text>
 
         <View style={styles.formContainer}>
 
           <Text style={styles.label}>Email</Text>
-          <TextInput placeholder="Email address" style={styles.input} />
+          <TextInput
+            placeholder="Email address"
+            placeholderTextColor="#A8A8A8"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={styles.input}
+          />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput placeholder="Password" secureTextEntry style={styles.input} />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="default"
+              placeholderTextColor="#A8A8A8"
+              style={[styles.input, styles.passwordInput]}
+            />
+            <TouchableOpacity
+              style={styles.eyeIconWrapper}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Image
+                source={require('../assets/eye-open.png')}
+                style={styles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.label}>Confirm Password</Text>
-          <TextInput placeholder="Confirm Password" secureTextEntry style={styles.input} />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Confirm Password"
+              secureTextEntry={!showConfirmPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="default"
+              placeholderTextColor="#A8A8A8"
+              style={[styles.input, styles.passwordInput]}
+            />
+            <TouchableOpacity
+              style={styles.eyeIconWrapper}
+              onPress={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+            >
+              <Image
+                source={require('../assets/eye-open.png')}
+                style={styles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={styles.loginBtn}>
             <Text style={styles.loginText}>Send</Text>
           </TouchableOpacity>
 
-          <View style={styles.helperRow}>
-            <Text style={styles.helperNormal}>
-              Having issues with the activation?
-            </Text>
-            <TouchableOpacity onPress={() => console.log('Chat Us pressed!')}>
-              <Text style={styles.helperChatUs}> Chat Us</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.helperText}>
+            Having issues with the activation?
+            <Text style={styles.chatUs}> Chat Us</Text>
+          </Text>
         </View>
+
       </View>
     </TouchableWithoutFeedback>
   );
@@ -78,9 +115,8 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffe7d9',
+    backgroundColor: '#FFE7D9',
   },
-
   backTopLeft: {
     position: 'absolute',
     top: 60,
@@ -90,89 +126,98 @@ const styles = StyleSheet.create({
   backIcon: {
     width: 24,
     height: 24,
-    tintColor: '#000000ff',
   },
-
   logo: {
     alignSelf: 'center',
-    marginTop: 113,
+    width: 163,
+    height: 163,
+    resizeMode: 'contain',
+    marginTop: 118,
   },
-
   headerText: {
-    fontFamily: 'Inter_24pt-Medium',
-    fontWeight: '500',
-    fontSize: 16,
+    marginTop: 15,
+    fontSize: 20,
+    fontWeight: '600',
     color: '#0C0E11',
+    textAlign: 'center',
+  },
+  subHeader: {
+    marginTop: 8,
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#6B6D79',
+    paddingHorizontal: 40,
+    lineHeight: 20,
   },
 
-  subHeaderContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  subHeaderText: {
-    color: '#6B6D79',
-    fontFamily: 'Inter_24pt-Medium',
+formContainer: {
+  position: 'absolute',
+  top: 416,
+  width: '100%',
+  minHeight: 428, 
+  bottom: 0,
+  backgroundColor: '#fff',
+  borderTopLeftRadius: 32,
+  borderTopRightRadius: 32,
+  padding: 24,
+  opacity: 1,
+},
+  label: {
+    fontSize: 15,
     fontWeight: '500',
+    marginTop: 24, 
+  },
+  input: {
+    backgroundColor: '#F1F2F3',
+    height: 50,
+    marginTop: 10,
+    borderRadius: 12,
+    paddingHorizontal: 15,
     fontSize: 14,
   },
-
-  formContainer: {
-    flex: 1,
-    width: '100%',
-    marginTop: 40,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingHorizontal: 20,
+  passwordContainer: {
+    position: 'relative',
+    justifyContent: 'center',
   },
-
-  label: {
-    fontFamily: 'Inter_24pt-Medium',
-    fontSize: 16,
-    fontWeight: '500',
-    marginTop: 25,
+  passwordInput: {
+    paddingRight: 45,
   },
-input: {
-  backgroundColor: '#F1F2F3',
-  height: 40,
-  color:'#6B6D79',
-  borderColor: '#C5C5C5',
-  borderWidth: 1,
-  marginTop: 12,
-  paddingHorizontal: 10,
-  borderRadius: 8,
-  paddingLeft: 12,
+eyeIconWrapper: {
+  position: 'absolute',
+  right: 12,
+  height: 50,             
+  justifyContent: 'center', 
+  alignItems: 'center',
 },
 
+
+  eyeIcon: {
+    width: 20,
+    height: 20,
+    tintColor: '#6B6D79',
+    resizeMode: 'contain',
+     marginTop: 8,
+  },
   loginBtn: {
-    backgroundColor: '#ff6e4e',
-    height: 48,
-    borderRadius: 8,
+    backgroundColor: '#FF6000',
+    height: 50,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 32, 
   },
   loginText: {
     color: '#fff',
-    fontFamily: 'Inter_24pt-Medium',
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
   },
-
-  helperRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 18,
-  },
-  helperNormal: {
+  helperText: {
+    textAlign: 'center',
+    marginTop: 24,
     color: '#6B6D79',
-    fontSize: 14,
-    fontFamily: 'Inter_24pt-Medium',
-    fontWeight: '500',
   },
-  helperChatUs: {
-    color: '#ff6e4e',
-    fontSize: 14,
-    fontFamily: 'Inter_24pt-Medium',
-    fontWeight: '500',
+  chatUs: {
+    color: '#FF6000',
+    fontWeight: '700',
   },
 });
