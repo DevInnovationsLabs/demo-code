@@ -8,6 +8,7 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
+  Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -15,11 +16,11 @@ export default function SignupScreen() {
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-
         <TouchableOpacity
           style={styles.backTopLeft}
           onPress={() => navigation.goBack()}
@@ -37,11 +38,11 @@ export default function SignupScreen() {
 
         <Text style={styles.headerText}>Activate Your Account</Text>
         <Text style={styles.subHeader}>
-          Please make sure you have been invited by your company to activate your account
+          Please make sure you have been invited by your company to activate
+          your account
         </Text>
 
         <View style={styles.formContainer}>
-
           <Text style={styles.label}>Email</Text>
           <TextInput
             placeholder="Email address"
@@ -86,9 +87,7 @@ export default function SignupScreen() {
             />
             <TouchableOpacity
               style={styles.eyeIconWrapper}
-              onPress={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               <Image
                 source={require('../assets/eye-open.png')}
@@ -97,7 +96,10 @@ export default function SignupScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.loginBtn}>
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={() => setPopupVisible(true)}
+          >
             <Text style={styles.loginText}>Send</Text>
           </TouchableOpacity>
 
@@ -106,7 +108,38 @@ export default function SignupScreen() {
             <Text style={styles.chatUs}> Chat Us</Text>
           </Text>
         </View>
+        {/* Popup Modal */}
+        <Modal
+          transparent={true}
+          visible={popupVisible}
+          animationType="fade"
+          onRequestClose={() => setPopupVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <View style={styles.modalImg}>
+                <Image
+                  source={require('../assets/check.png')}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={{ ...styles.modalTitle,fontWeight:'bold',marginBottom:10,fontSize: 28 }}>Success!</Text>
+              <Text style={{ ...styles.modalMsg,fontWeight:'bold',fontSize: 16,fontFamily: 'Inter_24pt-Regular' }}>
+                Your activation request has been sent.
+              </Text>
 
+              <TouchableOpacity
+                style={styles.closeBtn}
+                onPress={() => {
+                  setPopupVisible(false);
+                  navigation.replace('Login');
+                }}
+              >
+                <Text style={styles.closeBtnText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -150,22 +183,22 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-formContainer: {
-  position: 'absolute',
-  top: 416,
-  width: '100%',
-  minHeight: 428, 
-  bottom: 0,
-  backgroundColor: '#fff',
-  borderTopLeftRadius: 32,
-  borderTopRightRadius: 32,
-  padding: 24,
-  opacity: 1,
-},
+  formContainer: {
+    position: 'absolute',
+    top: 416,
+    width: '100%',
+    minHeight: 428,
+    bottom: 0,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 24,
+    opacity: 1,
+  },
   label: {
     fontSize: 15,
     fontWeight: '500',
-    marginTop: 24, 
+    marginTop: 24,
   },
   input: {
     backgroundColor: '#F1F2F3',
@@ -182,21 +215,20 @@ formContainer: {
   passwordInput: {
     paddingRight: 45,
   },
-eyeIconWrapper: {
-  position: 'absolute',
-  right: 12,
-  height: 50,             
-  justifyContent: 'center', 
-  alignItems: 'center',
-},
-
+  eyeIconWrapper: {
+    position: 'absolute',
+    right: 12,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   eyeIcon: {
     width: 20,
     height: 20,
     tintColor: '#6B6D79',
     resizeMode: 'contain',
-     marginTop: 8,
+    marginTop: 8,
   },
   loginBtn: {
     backgroundColor: '#FF6000',
@@ -204,7 +236,7 @@ eyeIconWrapper: {
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32, 
+    marginTop: 32,
   },
   loginText: {
     color: '#fff',
@@ -219,5 +251,46 @@ eyeIconWrapper: {
   chatUs: {
     color: '#FF6000',
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalBox: {
+    width: 260,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: '#111',
+  },
+  modalMsg: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 20,
+  },
+  closeBtn: {
+    backgroundColor: '#FF6000',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  closeBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  modalImg: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20
   },
 });
