@@ -5,7 +5,7 @@ const TABS = [
   { label: 'Home', icon: require('../assets/Home.png'), screen: 'Home' },
   { label: 'Schedule', icon: require('../assets/dates.png'), screen: 'Home' },
   { label: 'Employee', icon: require('../assets/multi-user.png'), screen: 'Home' },
-  { label: 'Activity', icon: require('../assets/clock.png'), screen: 'Home' },
+  { label: 'Activity', icon: require('../assets/clock.png'), screen: 'Activity' },
   { label: 'Profile', icon: require('../assets/user.png'), screen: 'Profile' },
 ];
 
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 78, 
+    height: 68, 
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -66,8 +66,7 @@ const styles = StyleSheet.create({
 
   tabIcon: {
     width: 26, 
-    height: 26,
-    tintColor: '#4B4B4B', 
+    height: 26, 
     marginBottom: 2,
   },
 

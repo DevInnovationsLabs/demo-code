@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -15,27 +14,30 @@ export default function ProfilePage({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={require('../assets/back.png')}
-            style={styles.headerIcon}
-          />
-        </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Profile</Text>
+      {/* FULL WHITE BEHIND NOTCH */}
+      <View style={styles.headerWrapper}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image
+              source={require('../assets/back.png')}
+              style={styles.headerIcon}
+            />
+          </TouchableOpacity>
 
-        <TouchableOpacity style={{height:24,width:24,alignItems:'center',justifyContent:'center'}}>
-          <Image
-            source={require('../assets/Bell.png')}
-            style={styles.headerIcon}
-          />
-        </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile</Text>
+
+          <TouchableOpacity style={{ height: 24, width: 24, alignItems: 'center', justifyContent: 'center' }}>
+            <Image
+              source={require('../assets/Bell.png')}
+              style={styles.headerIcon}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-        
+
         <View style={styles.profileCard}>
           <View style={styles.profileLeft}>
             <Image
@@ -102,26 +104,32 @@ export default function ProfilePage({ navigation }) {
       </ScrollView>
 
       <BottomNav navigation={navigation} activeTab="Profile" />
-
     </SafeAreaView>
   );
 }
+
 
 /************ STYLES ************/
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF', // FIX: white behind notch
   },
+
+  /* WHITE AREA INCLUDING SAFE AREA */
+  headerWrapper: {
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
   headerIcon: { width: 18, height: 19.5, tintColor: '#111' },
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#111' },
@@ -130,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 20,
     marginTop: 26,
-    marginBottom:25,
+    marginBottom: 25,
     borderRadius: 18,
     paddingVertical: 20,
     paddingHorizontal: 18,
@@ -139,6 +147,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+
   profileLeft: { flexDirection: 'row', alignItems: 'center' },
   profilePic: { width: 54, height: 54, borderRadius: 27, marginRight: 14 },
   profileName: { fontSize: 16, fontWeight: '700', color: '#111' },
@@ -147,7 +156,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 12,
-    fontFamily:'Inter_24pt-Medium',
+    fontFamily: 'Inter_24pt-Medium',
     lineHeight: 16,
     color: '#777986',
     marginTop: 24,
@@ -157,35 +166,48 @@ const styles = StyleSheet.create({
   },
 
   rowItem: {
-    width:342,
-    height:48,
+    width: 342,
+    height: 48,
     backgroundColor: '#fff',
     marginHorizontal: 20,
     paddingVertical: 14,
     paddingHorizontal: 18,
     borderRadius: 12,
-    border:12,
     marginBottom: 12,
     elevation: 1,
   },
-  rowLeft: { flexDirection: 'row', alignItems: 'center',width:284,height:20 },
-  rowText: { fontFamily:'Inter_24pt-Medium',fontSize: 14, fontWeight: '500', color: '#0C0E11', marginLeft: 16,lineHeight:20},
+
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 284,
+    height: 20,
+  },
+
+  rowText: {
+    fontFamily: 'Inter_24pt-Medium',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#0C0E11',
+    marginLeft: 16,
+    lineHeight: 20
+  },
+
   rowIcon: { width: 18, height: 18, tintColor: '#111' },
 
- logoutBtn: {
-  width: '90%',
-  height: 50,
-  alignSelf: 'center',
-  backgroundColor: '#FFE4E2',
-  borderRadius: 12,
-  marginTop: 100,
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-logoutText: {
-  fontSize: 15,
-  fontWeight: '700',
-  color: '#FC4C3C',
-},
-
+  logoutBtn: {
+    width: '90%',
+    height: 50,
+    alignSelf: 'center',
+    backgroundColor: '#FFE4E2',
+    borderRadius: 12,
+    marginTop: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FC4C3C',
+  },
 });

@@ -7,12 +7,57 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
+import { launchCamera } from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import BottomNav from '../screens/BottomNav'; 
+import BottomNav from '../screens/BottomNav';
 
 export default function HomePage({ navigation }) {
   const [showLocationPopup, setShowLocationPopup] = useState(true);
+  const [clockedIn, setClockedIn] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [showCapturePopup, setShowCapturePopup] = useState(false);
+
+  const handleClockIn = async () => {
+    if (!clockedIn) {
+      try {
+        if (Platform.OS === 'android') {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            alert('Camera permission denied');
+            return;
+          }
+        }
+
+        launchCamera(
+          {
+            mediaType: 'photo',
+            saveToPhotos: false,
+            cameraType: 'front',
+          },
+          res => {
+            if (res.didCancel) return;
+            if (res.assets && res.assets.length > 0) {
+              const photoUri = res.assets[0].uri;
+
+              setCapturedImage(photoUri);
+              setShowCapturePopup(true);
+              setClockedIn(true);
+            }
+          },
+        );
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      setClockedIn(false);
+      setCapturedImage(null);
+    }
+  };
 
   return (
     <ImageBackground
@@ -25,7 +70,7 @@ export default function HomePage({ navigation }) {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 140 }}
         >
-          {/* ===== PROFILE ===== */}
+
           <View style={styles.profileSection}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image
@@ -37,29 +82,41 @@ export default function HomePage({ navigation }) {
                 <Text style={styles.profileRole}>Product Designer</Text>
               </View>
             </View>
-            <TouchableOpacity style={{height:24,width:24,alignItems:'center',justifyContent:'center'}}>
-            <Image
-              source={require('../assets/Bell.png')}
-              style={styles.bellIcon}
-            />
+            <TouchableOpacity
+              style={{
+                height: 24,
+                width: 24,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Image
+                source={require('../assets/Bell.png')}
+                style={styles.bellIcon}
+              />
             </TouchableOpacity>
           </View>
 
-          {/* ===== TIME ===== */}
           <View style={styles.timeBlock}>
             <Text style={styles.timeText}>07:40</Text>
             <Text style={styles.dateText}>Monday, 01 November</Text>
           </View>
 
-          {/* ===== CLOCK BTN ===== */}
-          <TouchableOpacity activeOpacity={0.9} style={styles.clockBtn}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.clockBtn}
+            onPress={handleClockIn}
+          >
             <Image
-              source={require('../assets/btn-clock.png')}
+              source={
+                clockedIn
+                  ? require('../assets/out-clock.png')
+                  : require('../assets/btn-clock.png')
+              }
               style={styles.clockImage}
             />
           </TouchableOpacity>
 
-          {/* ===== LOCATION ===== */}
           <View style={styles.locationBlock}>
             <Image
               source={require('../assets/pin-loc.png')}
@@ -70,7 +127,6 @@ export default function HomePage({ navigation }) {
             </Text>
           </View>
 
-          {/* ===== STATS ===== */}
           <View style={styles.statsRow}>
             {STATS.map((item, i) => (
               <View key={i} style={styles.statItem}>
@@ -81,9 +137,7 @@ export default function HomePage({ navigation }) {
             ))}
           </View>
 
-          {/* ===== WHITE BOTTOM SHEET ===== */}
           <View style={styles.bottomSheet}>
-            {/* Feature grid */}
             <View style={styles.featureGrid}>
               {FEATURES.map((item, i) => (
                 <TouchableOpacity key={i} style={styles.featureCard}>
@@ -95,13 +149,11 @@ export default function HomePage({ navigation }) {
               ))}
             </View>
 
-            {/* Dots */}
             <View style={styles.dotsRow}>
               <View style={styles.dotActive} />
               <View style={styles.dotInactive} />
             </View>
 
-            {/* ===== YOUR ACTIVITY ===== */}
             <Text style={styles.activityTitle}>Your Activity</Text>
 
             {ACTIVITIES.map((item, index) => (
@@ -125,10 +177,8 @@ export default function HomePage({ navigation }) {
           </View>
         </ScrollView>
 
-        {/* ===== BOTTOM NAVBAR (GLOBAL) ===== */}
         <BottomNav navigation={navigation} activeTab="Home" />
 
-        {/* ===== LOCATION POPUP ===== */}
         {showLocationPopup && (
           <View style={styles.popupOverlay}>
             <View style={styles.locationPopupBox}>
@@ -161,16 +211,51 @@ export default function HomePage({ navigation }) {
             </View>
           </View>
         )}
+        {showCapturePopup && (
+          <View style={styles.popupOverlay}>
+            <View style={styles.capturePopup}>
+              <Image
+                source={require('../assets/check.png')}
+                style={styles.capturedImg}
+              />
+
+              <Text style={styles.captureTitle}>Attendance Successful!</Text>
+
+              <Text style={styles.captureInfo}>
+                Great job! Your attendance has been successfully recorded.
+                You're all set for today.
+              </Text>
+
+              <TouchableOpacity
+                style={styles.doneBtn}
+                onPress={() => setShowCapturePopup(false)}
+              >
+                <Text style={styles.doneBtnText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </SafeAreaView>
     </ImageBackground>
   );
 }
 
-/******** DATA ********/
 const STATS = [
-  { label: 'Clock-In', time: '07:40', icon: require('../assets/clock-in.png') },
-  { label: 'Clock-Out', time: '16:40', icon: require('../assets/afternoon.png') },
-  { label: 'Working Hrs', time: '09h00m', icon: require('../assets/countdown.png') },
+  {
+    label: 'Clock-In',
+    time: '07:40',
+    icon: require('../assets/clock-in.png'),
+  },
+  {
+    label: 'Clock-Out',
+    time: '16:40',
+    icon: require('../assets/afternoon.png'),
+  },
+  {
+    label: 'Working Hrs',
+    time: '09h00m',
+    icon: require('../assets/countdown.png'),
+  },
 ];
 
 const FEATURES = [
@@ -217,7 +302,13 @@ const ACTIVITIES = [
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  bg: { flex: 1, width: '100%', height: '100%', paddingTop: 0 },
+
+  bg: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    paddingTop: 0,
+  },
 
   profileSection: {
     paddingTop: 50,
@@ -226,17 +317,59 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  profileImg: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-  bellIcon: { width: 18, height: 19.5, tintColor: '#fff' },
-  profileName: { fontSize: 20, fontWeight: '600', color: '#fff' },
-  profileRole: { fontSize: 12, fontWeight: '500', color: '#FFE8DB' },
 
-  timeBlock: { alignItems: 'center', marginTop: 28 },
-  timeText: { fontSize: 42, fontWeight: '700', color: '#fff' },
-  dateText: { fontSize: 14, fontWeight: '500', color: '#FFE8DB' },
+  profileImg: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
 
-  clockBtn: { alignSelf: 'center', marginTop: 28 },
-  clockImage: { width: 160, height: 160, resizeMode: 'contain' },
+  bellIcon: {
+    width: 18,
+    height: 19.5,
+    tintColor: '#fff',
+  },
+
+  profileName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#fff',
+  },
+
+  profileRole: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#FFE8DB',
+  },
+
+  timeBlock: {
+    alignItems: 'center',
+    marginTop: 28,
+  },
+
+  timeText: {
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#fff',
+  },
+
+  dateText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#FFE8DB',
+  },
+
+  clockBtn: {
+    alignSelf: 'center',
+    marginTop: 28,
+  },
+
+  clockImage: {
+    width: 160,
+    height: 160,
+    resizeMode: 'contain',
+  },
 
   locationBlock: {
     flexDirection: 'row',
@@ -244,18 +377,43 @@ const styles = StyleSheet.create({
     marginTop: 18,
     alignItems: 'center',
   },
-  locationIcon: { width: 14, height: 14, tintColor: '#fff' },
-  locationText: { fontSize: 13, marginLeft: 6, color: '#fff' },
+
+  locationIcon: {
+    width: 14,
+    height: 14,
+    tintColor: '#fff',
+  },
+
+  locationText: {
+    fontSize: 13,
+    marginLeft: 6,
+    color: '#fff',
+  },
 
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 26,
   },
+
   statItem: { alignItems: 'center' },
-  statIcon: { width: 22, height: 22 },
-  statTime: { fontSize: 15, fontWeight: '600', color: '#fff' },
-  statLabel: { fontSize: 11, fontWeight: '500', color: '#FFE8DB' },
+
+  statIcon: {
+    width: 22,
+    height: 22,
+  },
+
+  statTime: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+  },
+
+  statLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#FFE8DB',
+  },
 
   bottomSheet: {
     marginTop: 42,
@@ -273,6 +431,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+
   featureCard: {
     width: '22%',
     backgroundColor: '#FFFFFF',
@@ -281,6 +440,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginBottom: 18,
   },
+
   featureIconWrap: {
     width: 40,
     height: 40,
@@ -290,7 +450,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  featureIcon: { width: 24, height: 24 },
+
+  featureIcon: {
+    width: 24,
+    height: 24,
+  },
+
   featureLabel: {
     fontSize: 10.5,
     fontWeight: '600',
@@ -303,6 +468,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16,
   },
+
   dotActive: {
     width: 22,
     height: 4,
@@ -310,6 +476,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 4,
   },
+
   dotInactive: {
     width: 6,
     height: 4,
@@ -324,6 +491,7 @@ const styles = StyleSheet.create({
     color: '#111',
     marginBottom: 10,
   },
+
   activityCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -334,7 +502,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     elevation: 3,
   },
-  activityLeft: { flexDirection: 'row', alignItems: 'center' },
+
+  activityLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
   activityIconCircle: {
     width: 32,
     height: 32,
@@ -344,12 +517,38 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 10,
   },
-  activityIcon: { width: 18, height: 18 },
-  activityName: { fontSize: 14, fontWeight: '700', color: '#161827' },
-  activityDate: { fontSize: 12, fontWeight: '500', color: '#9A9CAC' },
-  activityRight: { alignItems: 'flex-end' },
-  activityTime: { fontSize: 14, fontWeight: '700' },
-  activityStatus: { fontSize: 12, fontWeight: '600', color: '#9A9CAC' },
+
+  activityIcon: {
+    width: 18,
+    height: 18,
+  },
+
+  activityName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#161827',
+  },
+
+  activityDate: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#9A9CAC',
+  },
+
+  activityRight: {
+    alignItems: 'flex-end',
+  },
+
+  activityTime: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  activityStatus: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9A9CAC',
+  },
 
   popupOverlay: {
     position: 'absolute',
@@ -362,6 +561,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 999,
   },
+
   locationPopupBox: {
     width: 282,
     height: 348,
@@ -373,22 +573,26 @@ const styles = StyleSheet.create({
     elevation: 10,
     position: 'relative',
   },
+
   closeBtn: {
     position: 'absolute',
     top: 14,
     right: 14,
     zIndex: 10,
   },
+
   closeIcon: {
     width: 24,
     height: 24,
   },
+
   locationIllustration: {
     width: 234,
     height: 140,
     marginTop: 10,
     marginBottom: 16,
   },
+
   locationPopupTitle: {
     fontSize: 16,
     fontWeight: '700',
@@ -397,6 +601,7 @@ const styles = StyleSheet.create({
     width: 240,
     marginBottom: 22,
   },
+
   turnOnBtn: {
     width: 234,
     height: 40,
@@ -405,7 +610,62 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   turnOnBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  capturePopup: {
+    width: 282,
+    height: 310,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  capturedImg: {
+    width: 90,
+    height: 90,
+    borderRadius: 12,
+    marginBottom: 14,
+  },
+
+  captureTitle: {
+    width: 234,
+    height: 24,
+    fontFamily: 'Inter_24pt-Bold',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0C0E11',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+
+  captureInfo: {
+    height: 60,
+    width: 234,
+    fontFamily: 'Inter_24pt-Regular',
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#000000',
+    marginTop: 4,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+
+  doneBtn: {
+    width: 234,
+    height: 40,
+    backgroundColor: '#FF6000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+
+  doneBtnText: {
     fontSize: 14,
     fontWeight: '700',
     color: '#fff',
