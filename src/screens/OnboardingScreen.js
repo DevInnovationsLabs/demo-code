@@ -78,7 +78,7 @@ export default function OnboardingScreen() {
     }
   };
 
-  const onScrollEnd = (e) => {
+  const onScrollEnd = e => {
     const x = e.nativeEvent.contentOffset.x;
     setIndex(Math.round(x / width));
   };
@@ -100,7 +100,7 @@ export default function OnboardingScreen() {
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
       >
         {SCREENS.map((screen, i) => {
@@ -151,8 +151,7 @@ export default function OnboardingScreen() {
                     styles.dot,
                     {
                       width: animatedWidth,
-                      backgroundColor:
-                        index === i ? '#FF6000' : '#FFCEB0',
+                      backgroundColor: index === i ? '#FF6000' : '#FFCEB0',
                     },
                   ]}
                 />
@@ -195,7 +194,7 @@ const styles = StyleSheet.create({
     height: height * 0.35,
     resizeMode: 'contain',
     alignSelf: 'center',
-    marginTop: 200, 
+    marginTop: 200,
   },
 
   card: {
@@ -209,6 +208,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
+    fontFamily: 'Inter_24pt-Medium',
     paddingTop: 32,
     paddingHorizontal: CARD_PADDING,
     fontSize: 22,
@@ -218,13 +218,14 @@ const styles = StyleSheet.create({
   },
 
   description: {
+    fontFamily: 'Inter_24pt-Regular',
+    fontWeight: '400',
     fontSize: 14,
     paddingHorizontal: CARD_PADDING,
-    color: '#6B6D79',
+    color: '#454545',
     lineHeight: 20,
     marginBottom: 35,
   },
-
   bottomRowAbsolute: {
     position: 'absolute',
     bottom: 0,

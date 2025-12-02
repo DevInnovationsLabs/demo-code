@@ -15,6 +15,66 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNav from '../screens/BottomNav';
 
 export default function HomePage({ navigation }) {
+
+  const STATS = [
+  {
+    label: 'Clock-In',
+    time: '07:40',
+    icon: require('../assets/clock-in.png'),
+  },
+  {
+    label: 'Clock-Out',
+    time: '16:40',
+    icon: require('../assets/afternoon.png'),
+  },
+  {
+    label: 'Working Hrs',
+    time: '09h00m',
+    icon: require('../assets/countdown.png'),
+  },
+];
+
+const FEATURES = [
+  { label: 'Leave', icon: require('../assets/Holiday.png') },
+  { label: 'Swap\nSchedule', icon: require('../assets/Calendar.png') ,onPress: () => navigation.navigate('SwapSchedule')  },
+  { label: 'Overtime', icon: require('../assets/Timer.png') },
+  { label: 'Permissions', icon: require('../assets/Agreement.png') },
+  { label: 'My Payslip', icon: require('../assets/Purchase Order.png') },
+  { label: 'My Archives', icon: require('../assets/Documents.png') },
+  { label: 'Koperasi', icon: require('../assets/Bank Building.png') },
+  { label: 'Report', icon: require('../assets/System Report.png') },
+];
+
+const ACTIVITIES = [
+  {
+    title: 'Clock-In',
+    date: '01 Nov 2023',
+    time: '07:30',
+    status: 'On-time',
+    icon: require('../assets/icon-clock4.png'),
+  },
+  {
+    title: 'Clock-Out',
+    date: '01 Nov 2023',
+    time: '16:30',
+    status: 'On-time',
+    icon: require('../assets/icon-clock3.png'),
+  },
+  {
+    title: 'Clock-In',
+    date: '31 Sep 2023',
+    time: '07:30',
+    status: 'On-time',
+    icon: require('../assets/icon-clock2.png'),
+  },
+  {
+    title: 'Clock-Out',
+    date: '31 Sep 2023',
+    time: '16:30',
+    status: 'On-time',
+    icon: require('../assets/icon-clock.png'),
+  },
+];
   const [showLocationPopup, setShowLocationPopup] = useState(true);
   const [clockedIn, setClockedIn] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -140,7 +200,7 @@ export default function HomePage({ navigation }) {
           <View style={styles.bottomSheet}>
             <View style={styles.featureGrid}>
               {FEATURES.map((item, i) => (
-                <TouchableOpacity key={i} style={styles.featureCard}>
+                <TouchableOpacity key={i} style={styles.featureCard} onPress={item.onPress}>
                   <View style={styles.featureIconWrap}>
                     <Image source={item.icon} style={styles.featureIcon} />
                   </View>
@@ -239,66 +299,6 @@ export default function HomePage({ navigation }) {
     </ImageBackground>
   );
 }
-
-const STATS = [
-  {
-    label: 'Clock-In',
-    time: '07:40',
-    icon: require('../assets/clock-in.png'),
-  },
-  {
-    label: 'Clock-Out',
-    time: '16:40',
-    icon: require('../assets/afternoon.png'),
-  },
-  {
-    label: 'Working Hrs',
-    time: '09h00m',
-    icon: require('../assets/countdown.png'),
-  },
-];
-
-const FEATURES = [
-  { label: 'Leave', icon: require('../assets/Holiday.png') },
-  { label: 'Swap\nSchedule', icon: require('../assets/Calendar.png') },
-  { label: 'Overtime', icon: require('../assets/Timer.png') },
-  { label: 'Permissions', icon: require('../assets/Agreement.png') },
-  { label: 'My Payslip', icon: require('../assets/Purchase Order.png') },
-  { label: 'My Archives', icon: require('../assets/Documents.png') },
-  { label: 'Koperasi', icon: require('../assets/Bank Building.png') },
-  { label: 'Report', icon: require('../assets/System Report.png') },
-];
-
-const ACTIVITIES = [
-  {
-    title: 'Clock-In',
-    date: '01 Nov 2023',
-    time: '07:30',
-    status: 'On-time',
-    icon: require('../assets/icon-clock4.png'),
-  },
-  {
-    title: 'Clock-Out',
-    date: '01 Nov 2023',
-    time: '16:30',
-    status: 'On-time',
-    icon: require('../assets/icon-clock3.png'),
-  },
-  {
-    title: 'Clock-In',
-    date: '31 Sep 2023',
-    time: '07:30',
-    status: 'On-time',
-    icon: require('../assets/icon-clock2.png'),
-  },
-  {
-    title: 'Clock-Out',
-    date: '31 Sep 2023',
-    time: '16:30',
-    status: 'On-time',
-    icon: require('../assets/icon-clock.png'),
-  },
-];
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
